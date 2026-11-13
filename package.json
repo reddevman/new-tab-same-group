@@ -1,0 +1,11 @@
+{
+  "name": "new-tab-same-group",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node --check src/background.js && node --check src/background-controller.js && node --check src/grouping-policy.js && node --check src/tab-history.js && node --check scripts/build.mjs",
+    "test": "node --test"
+  }
+}

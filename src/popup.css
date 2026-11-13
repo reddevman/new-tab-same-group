@@ -1,0 +1,46 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-width: 300px;
+  background: #101827;
+  color: #f8fafc;
+}
+
+main {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 18px;
+}
+
+img {
+  flex: 0 0 auto;
+  image-rendering: pixelated;
+}
+
+h1 {
+  margin: 1px 0 6px;
+  color: #5eead4;
+  font-size: 16px;
+}
+
+p,
+small {
+  display: block;
+  margin: 0;
+  line-height: 1.4;
+}
+
+p {
+  font-size: 13px;
+}
+
+small {
+  margin-top: 8px;
+  color: #cbd5e1;
+  font-size: 11px;
+}
