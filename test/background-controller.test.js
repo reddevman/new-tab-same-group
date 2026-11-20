@@ -69,8 +69,11 @@ function createChromeMock({ initialTabs, focusedWindowId = 1, groupBarrier } = {
         tabMap.get(tabIds).groupId = groupId;
         return groupId;
       },
-      async query({ active }) {
-        return [...tabMap.values()].filter((tab) => !active || tab.active).map((tab) => ({ ...tab }));
+      async query({ active, windowId } = {}) {
+        return [...tabMap.values()]
+          .filter((tab) => !active || tab.active)
+          .filter((tab) => !Number.isInteger(windowId) || tab.windowId === windowId)
+          .map((tab) => ({ ...tab }));
       }
     },
     windows: {
@@ -154,6 +157,22 @@ test("groups a native new tab into the previous group without storing its URL", 
   assert.deepEqual(mock.storageState.activeTabsByWindow, {
     "1": { id: 11, windowId: 1, groupId: 7, pinned: false }
   });
+});
+
+test("groups a native new tab into a group already present in the window", async () => {
+  const ungroupedPreviousTab = { ...previousTab, groupId: -1 };
+  const groupedTabInWindow = { ...previousTab, id: 12, groupId: 8, active: false };
+  const mock = createChromeMock({
+    initialTabs: [ungroupedPreviousTab, groupedTabInWindow]
+  });
+  const controller = createController(mock);
+
+  await controller.ensureInitialized();
+  mock.tabMap.get(ungroupedPreviousTab.id).active = false;
+  mock.tabMap.set(newTab.id, { ...newTab });
+  await controller.handleCreated({ ...newTab });
+
+  assert.deepEqual(mock.groupCalls, [{ tabIds: 11, groupId: 8 }]);
 });
 
 test("does not group a new tab created outside the focused window", async () => {

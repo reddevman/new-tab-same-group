@@ -6,7 +6,8 @@ previously active in the same window.
 ## Behaviour
 
 - Opening a new tab from a grouped tab adds it to that group.
-- Opening a new tab from an ungrouped tab leaves it ungrouped.
+- If the active tab is ungrouped but the window already has a group, the new
+  tab joins the first group in the tab strip.
 - State is tracked independently for each Chrome window.
 - Links opened in a new foreground or background tab are not grouped because
   their destination is not Chrome's New Tab page.

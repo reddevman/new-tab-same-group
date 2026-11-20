@@ -68,7 +68,7 @@ export function createBackgroundController({
   }
 
   function rememberCandidate(tab, previousTab) {
-    if (!Number.isInteger(tab.id) || !previousTab) {
+    if (!Number.isInteger(tab.id)) {
       return;
     }
 
@@ -103,6 +103,21 @@ export function createBackgroundController({
     return focusedWindow?.focused === true && focusedWindow.id === createdTab.windowId;
   }
 
+  async function getTargetGroupIdForWindow(createdTab, previousTab) {
+    const previousGroupId = getTargetGroupId(createdTab, previousTab);
+
+    if (previousGroupId !== null) {
+      return previousGroupId;
+    }
+
+    const tabsInWindow = await chromeApi.tabs.query({ windowId: createdTab.windowId });
+    const groupedTab = tabsInWindow.find(
+      (tab) => Number.isInteger(tab.groupId) && tab.groupId !== -1
+    );
+
+    return getTargetGroupId(createdTab, groupedTab);
+  }
+
   async function groupCandidate(tabId) {
     const candidate = candidates.get(tabId);
 
@@ -130,8 +145,17 @@ export function createBackgroundController({
         return;
       }
 
-      const previousTab = await chromeApi.tabs.get(candidate.previousTab.id);
-      const targetGroupId = getTargetGroupId(createdTab, previousTab);
+      let previousTab;
+
+      if (candidate.previousTab) {
+        try {
+          previousTab = await chromeApi.tabs.get(candidate.previousTab.id);
+        } catch {
+          previousTab = undefined;
+        }
+      }
+
+      const targetGroupId = await getTargetGroupIdForWindow(createdTab, previousTab);
 
       if (targetGroupId === null) {
         forgetCandidate(tabId);
